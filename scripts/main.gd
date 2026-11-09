@@ -265,7 +265,7 @@ func _spawn_in_front() -> void:
     _update_status()
 
 func _place_block() -> void:
-    var hit := player.get_aim_hit()
+    var hit: Dictionary = player.get_aim_hit()
     var pos: Vector3
     if hit.is_empty():
         pos = player.camera.global_position + (-player.camera.global_transform.basis.z * 5.0)
@@ -276,7 +276,7 @@ func _place_block() -> void:
     _update_status()
 
 func _use_tool() -> void:
-    var hit := player.get_aim_hit()
+    var hit: Dictionary = player.get_aim_hit()
     if hit.is_empty():
         return
     var target = hit.collider
