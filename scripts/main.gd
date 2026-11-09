@@ -48,13 +48,18 @@ func _create_environment() -> void:
     environment.ambient_light_color = Color(0.48, 0.54, 0.62)
     environment.ambient_light_energy = 0.55
     environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+    environment.fog_enabled = true
+    environment.fog_light_color = Color(0.30, 0.36, 0.43)
+    environment.fog_density = 0.006
+    environment.fog_sky_affect = 0.35
     env.environment = environment
     add_child(env)
 
     var sun := DirectionalLight3D.new()
     sun.rotation_degrees = Vector3(-48, -28, 0)
-    sun.light_energy = 1.25
+    sun.light_energy = 1.45
     sun.shadow_enabled = true
+    sun.directional_shadow_max_distance = 55.0
     add_child(sun)
 
     _make_static_box("Ground", Vector3(0,-0.5,0), Vector3(70,1,70), Color(0.19,0.21,0.23))
@@ -151,7 +156,7 @@ func _create_ui() -> void:
     var title := Label.new()
     title.text = "MAYHEM ENGINE  /  PHYSICS SANDBOX"
     title.position = Vector2(24,18)
-    title.add_theme_font_size_override("font_size", 18)
+    title.add_theme_font_size_override("font_size", 16 if OS.has_feature("mobile") else 18)
     title.add_theme_color_override("font_color", Color(0.86,0.91,0.96))
     root.add_child(title)
 
@@ -171,34 +176,34 @@ func _create_ui() -> void:
 
     var help := Label.new()
     help.text = "WASD: move   SPACE: jump   E: pick up / drop   Q: throw\nB: build mode   LMB: use tool / place   1-4: material   ESC: unlock mouse"
-    help.position = Vector2(24, get_viewport().get_visible_rect().size.y - 62)
-    help.add_theme_font_size_override("font_size", 13)
+    help.position = Vector2(18, get_viewport().get_visible_rect().size.y - (72 if OS.has_feature("mobile") else 62))
+    help.add_theme_font_size_override("font_size", 11 if OS.has_feature("mobile") else 13)
     help.add_theme_color_override("font_color", Color(0.72,0.78,0.83))
     root.add_child(help)
 
     _create_mobile_buttons(root)
 
 func _create_mobile_buttons(root: Control) -> void:
-    var build := _make_button(root, "BUILD", Vector2(-150,-190), Vector2(126,48))
+    var build := _make_button(root, "BUILD", Vector2(-116,-148), Vector2(104,42))
     build.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
     build.pressed.connect(_toggle_build)
-    var spawn := _make_button(root, "SPAWN", Vector2(-150,-132), Vector2(126,48))
+    var spawn := _make_button(root, "SPAWN", Vector2(-116,-98), Vector2(104,42))
     spawn.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
     spawn.pressed.connect(_spawn_in_front)
-    var grab := _make_button(root, "GRAB", Vector2(-290,-132), Vector2(126,48))
+    var grab := _make_button(root, "GRAB", Vector2(-230,-98), Vector2(104,42))
     grab.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
     grab.pressed.connect(func(): player.try_pickup())
-    var throw_btn := _make_button(root, "THROW", Vector2(-290,-74), Vector2(126,48))
+    var throw_btn := _make_button(root, "THROW", Vector2(-230,-48), Vector2(104,42))
     throw_btn.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
     throw_btn.pressed.connect(func(): player.throw_held())
 
-    var jump_btn := _make_button(root, "JUMP", Vector2(-150,-74), Vector2(126,48))
+    var jump_btn := _make_button(root, "JUMP", Vector2(-116,-48), Vector2(104,42))
     jump_btn.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
     jump_btn.button_down.connect(func(): player.velocity.y = 5.0)
 
     var pad := TouchScreenButton.new()
     pad.name = "TouchMoveHint"
-    pad.position = Vector2(90, get_viewport().get_visible_rect().size.y - 120)
+    pad.position = Vector2(48, get_viewport().get_visible_rect().size.y - 150)
     pad.texture_normal = _make_pad_texture()
     pad.texture_pressed = _make_pad_texture()
     pad.action = ""
